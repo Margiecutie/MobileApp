@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const GardenPetApp());
@@ -294,11 +295,123 @@ class _GardenPetHomeState extends State<GardenPetHome>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF4CAF50),
-        title: const Text(
-          'Grow A Garden Pet Info',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Grow A Garden',
+              style: GoogleFonts.quicksand(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.1,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Pet Info',
+              style: GoogleFonts.quicksand(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.0,
+                color: Colors.white70,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    backgroundColor: Colors.transparent,
+                    insetPadding: const EdgeInsets.all(24),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF8B4513),
+                            Color(0xFFA0522D),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: Color(0xFFF5DEB3), width: 2),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'How to Use',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Click any pet box below to view its information.',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFFF5DEB3),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: Color(0xFF8B4513),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: const Color(0x804CAF50), // semi-transparent green
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Color(0xFFF5DEB3), width: 1.5),
+                ),
+                child: const Center(
+                  child: Text(
+                    'i',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -336,6 +449,10 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: Color(0xFFF5DEB3),
+                                      width: 2,
+                                    ),
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(24),
@@ -447,7 +564,7 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                 ),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: const Color(0xFF7B3F00),
+                                  color: Colors.white,
                                   width: 2,
                                 ),
                                 boxShadow: [
