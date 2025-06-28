@@ -2,6 +2,35 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// PetInfo class at top-level
+class PetInfo {
+  final String name;
+  final String image;
+  final String detailImage;
+  final String description;
+  final String tier;
+  final String obtainingMethod;
+  final String hatchChance;
+  final String passive;
+  final String obtainable;
+  final String dateAdded;
+  final String? box;
+
+  PetInfo({
+    required this.name,
+    required this.image,
+    required this.detailImage,
+    required this.description,
+    required this.tier,
+    required this.obtainingMethod,
+    required this.hatchChance,
+    required this.passive,
+    required this.obtainable,
+    required this.dateAdded,
+    this.box,
+  });
+}
+
 void main() {
   runApp(const GardenPetApp());
 }
@@ -54,7 +83,7 @@ class _GardenPetHomeState extends State<GardenPetHome>
     'assets/roblox 1.png',
     'assets/roblox 2.png',
     'assets/roblox 3.png',
-    'assets/tarantula001.png',
+    'assets/frog.png',
   ];
 
   final List<String> galleryImages = [
@@ -62,11 +91,11 @@ class _GardenPetHomeState extends State<GardenPetHome>
     'assets/turtle.png',
     'assets/queen bee.png',
     'assets/tarantula.png',
-    'assets/hamster.png',
-    'assets/parrot.png',
-    'assets/snake.png',
-    'assets/lizard.png',
-    'assets/goat.png',
+    'assets/bunny.png',
+    'assets/crab.png',
+    'assets/dog.png',
+    'assets/dog1.png',
+    'assets/seagul.png',
     'assets/duck.png',
     'assets/horse.png',
     'assets/chicken.png',
@@ -78,11 +107,11 @@ class _GardenPetHomeState extends State<GardenPetHome>
     'assets/turtle_big.png',
     'assets/queenbee11.png',
     'assets/tarantula001.png',
-    'assets/hamster_big.png',
-    'assets/parrot_big.png',
-    'assets/snake_big.png',
-    'assets/lizard_big.png',
-    'assets/goat_big.png',
+    'assets/bunny.png',
+    'assets/crab.png',
+    'assets/dog.png',
+    'assets/dog1.png',
+    'assets/seagul.png',
     'assets/duck_big.png',
     'assets/horse_big.png',
     'assets/chicken_big.png',
@@ -94,7 +123,7 @@ class _GardenPetHomeState extends State<GardenPetHome>
     'Turtle',
     'Queen Bee',
     'Tarantula',
-    'Hamster',
+    'Bunny',
     'Parrot',
     'Snake',
     'Lizard',
@@ -132,9 +161,9 @@ class _GardenPetHomeState extends State<GardenPetHome>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _fadeController.forward();
-    
+
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
       final next = (_currentPage + 1) % imageAssets.length;
       _pageController.animateToPage(
@@ -157,13 +186,66 @@ class _GardenPetHomeState extends State<GardenPetHome>
   // Method to filter pets based on selected category
   List<int> _getFilteredPetIndexes() {
     switch (_selectedCategory) {
-      case "Bee Egg":
-        // Only show Queen Bee (index 2) in the Bee Egg category
-        return [2];
+      case "Common":
+        // Show pets with Common tier
+        return pets
+            .asMap()
+            .entries
+            .where((entry) => pets[entry.key].tier.toLowerCase() == 'common')
+            .map((entry) => entry.key)
+            .toList();
+      case "Uncommon":
+        // Show pets with Uncommon tier
+        return pets
+            .asMap()
+            .entries
+            .where((entry) => pets[entry.key].tier.toLowerCase() == 'uncommon')
+            .map((entry) => entry.key)
+            .toList();
+      case "Rare":
+        // Show pets with Rare tier
+        return pets
+            .asMap()
+            .entries
+            .where((entry) => pets[entry.key].tier.toLowerCase() == 'rare')
+            .map((entry) => entry.key)
+            .toList();
+      case "Legendary":
+        // Show pets with Legendary tier
+        return pets
+            .asMap()
+            .entries
+            .where((entry) => pets[entry.key].tier.toLowerCase() == 'legendary')
+            .map((entry) => entry.key)
+            .toList();
+      case "Mythical":
+        // Show pets with Mythical tier
+        return pets
+            .asMap()
+            .entries
+            .where((entry) => pets[entry.key].tier.toLowerCase() == 'mythical')
+            .map((entry) => entry.key)
+            .toList();
+      case "Divine":
+        // Show pets with Divine tier
+        return pets
+            .asMap()
+            .entries
+            .where((entry) => pets[entry.key].tier.toLowerCase() == 'divine')
+            .map((entry) => entry.key)
+            .toList();
+      case "Prismatic":
+        // Show pets with Prismatic tier
+        return pets
+            .asMap()
+            .entries
+            .where((entry) => pets[entry.key].tier.toLowerCase() == 'prismatic')
+            .map((entry) => entry.key)
+            .toList();
       case "All":
       default:
         // Show all pets
-        return List.generate(galleryImages.length, (index) => index);
+        return List.generate(pets.length, (index) => index);
     }
   }
 
@@ -180,116 +262,146 @@ class _GardenPetHomeState extends State<GardenPetHome>
     }
   }
 
-  // Show the dialog with pet details
-  void showImageDialog(String imagePath, String petName, String rarity) {
-    _scaleController.forward();
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-            CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
-          ),
-          child: Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF8B4513),
-                      const Color(0xFFA0522D),
-                      const Color(0xFF8B4513),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            imagePath,
-                            fit: BoxFit.cover,
-                            width: 200,
-                            height: 200,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        petName,
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          shadows: [
-                            Shadow(
-                              offset: Offset(0, 2),
-                              blurRadius: 4,
-                              color: Colors.black26,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: _getRarityColors(rarity),
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          rarity,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "A magnificent $petName ready for your garden adventure!",
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                          height: 1.4,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                  onPressed: () => Navigator.of(context).pop(),
-                  tooltip: 'Close',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ).then((_) => _scaleController.reset());
-  }
+  // Replace the pet data lists with a list of PetInfo objects (showing only the first pet as an example)
+  final List<PetInfo> pets = [
+    PetInfo(
+      name: 'Starfish',
+      image: 'assets/starfish.jpg',
+      detailImage: 'assets/starfish.jpg',
+      description: 'A Starfish',
+      tier: 'Common',
+      obtainingMethod: 'Common Summer Egg',
+      hatchChance: '50%',
+      passive: 'You\'re a Star: Gains additional XP per second',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+    ),
+    PetInfo(
+      name: 'Queen Bee',
+      image: 'assets/queen bee.png',
+      detailImage: 'assets/queenbee11.png',
+      description: 'A Queen Bee',
+      tier: 'Rare',
+      obtainingMethod: 'Bee Egg',
+      hatchChance: '25%',
+      passive: 'Honey Maker: Produces honey over time',
+      obtainable: 'Yes',
+      dateAdded: 'June 15, 2025',
+    ),
+    PetInfo(
+      name: 'Bunny',
+      image: 'assets/bunny.png',
+      detailImage: 'assets/bunny.png',
+      description: 'The Bunny.',
+      tier: 'Common',
+      obtainingMethod: 'Common Egg',
+      hatchChance: '33.33%',
+      passive: 'Every 40s, eats a carrot at a 1.5x value bonus.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3rd, 2025',
+    ),
+    PetInfo(
+      name: 'Crab',
+      image: 'assets/crab.png',
+      detailImage: 'assets/crab.png',
+      description: 'A Crab',
+      tier: 'Common',
+      obtainingMethod: 'Common Summer Egg',
+      hatchChance: '25%',
+      passive:
+          'Pinch Pocket: Occasionally goes to another player and pinches them and grants you a small amount of sheckles',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+    ),
+    PetInfo(
+      name: 'Dog',
+      image: 'assets/dog.png',
+      detailImage: 'assets/dog.png',
+      description: 'A loyal Dog',
+      tier: 'Common',
+      obtainingMethod: 'Common Egg',
+      hatchChance: '33.33%',
+      passive: 'Every 60s, 5% chance to dig up a random seed.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3rd, 2025',
+      box: 'Common Egg',
+    ),
+    PetInfo(
+      name: 'Puppy',
+      image: 'assets/dog1.png',
+      detailImage: 'assets/dog1.png',
+      description: 'A cute Puppy',
+      tier: 'Common',
+      obtainingMethod: 'Pet Egg',
+      hatchChance: '45%',
+      passive: 'Playful: Makes you happy',
+      obtainable: 'Yes',
+      dateAdded: 'June 17, 2025',
+    ),
+    PetInfo(
+      name: 'Seagull',
+      image: 'assets/seagul.png',
+      detailImage: 'assets/seagul.png',
+      description: 'A Seagull',
+      tier: 'Common',
+      obtainingMethod: 'Common Summer Egg',
+      hatchChance: '25%',
+      passive:
+          'Scavenger: Shoveling plants have a percent chance to drop the equivalent seed. Does not work on fruits. Hunger: 3500',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+    ),
+    PetInfo(
+      name: 'Duck',
+      image: 'assets/duck.png',
+      detailImage: 'assets/duck_big.png',
+      description: 'A swimming Duck',
+      tier: 'Common',
+      obtainingMethod: 'Water Egg',
+      hatchChance: '50%',
+      passive: 'Water Walker: Can walk on water',
+      obtainable: 'Yes',
+      dateAdded: 'June 14, 2025',
+    ),
+    PetInfo(
+      name: 'Horse',
+      image: 'assets/horse.png',
+      detailImage: 'assets/horse_big.png',
+      description: 'A strong Horse',
+      tier: 'Divine',
+      obtainingMethod: 'Farm Egg',
+      hatchChance: '25%',
+      passive: 'Speed Runner: Very fast movement',
+      obtainable: 'Yes',
+      dateAdded: 'June 13, 2025',
+    ),
+    PetInfo(
+      name: 'Chicken',
+      image: 'assets/chicken.png',
+      detailImage: 'assets/chicken_big.png',
+      description: 'A farm Chicken',
+      tier: 'Common',
+      obtainingMethod: 'Farm Egg',
+      hatchChance: '60%',
+      passive: 'Egg Layer: Lays eggs daily',
+      obtainable: 'Yes',
+      dateAdded: 'June 12, 2025',
+    ),
+    PetInfo(
+      name: 'Hedgehog',
+      image: 'assets/hedgehog.png',
+      detailImage: 'assets/hedgehog_big.png',
+      description: 'A spiky Hedgehog',
+      tier: 'Prismatic',
+      obtainingMethod: 'Forest Egg',
+      hatchChance: '40%',
+      passive: 'Spike Shield: Protects from damage',
+      obtainable: 'Yes',
+      dateAdded: 'June 11, 2025',
+    ),
+  ];
 
+  // Update the pet grid to use pets list
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -441,11 +553,13 @@ class _GardenPetHomeState extends State<GardenPetHome>
                           child: PageView.builder(
                             controller: _pageController,
                             itemCount: imageAssets.length,
-                            onPageChanged: (i) => setState(() => _currentPage = i),
+                            onPageChanged: (i) =>
+                                setState(() => _currentPage = i),
                             itemBuilder: (context, index) {
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
-                                margin: const EdgeInsets.symmetric(horizontal: 16),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(24),
@@ -489,8 +603,14 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                 borderRadius: BorderRadius.circular(4),
                                 gradient: LinearGradient(
                                   colors: _currentPage == i
-                                      ? [const Color(0xFF59C639), const Color(0xFF4CAF50)]
-                                      : [Colors.white.withOpacity(0.3), Colors.white.withOpacity(0.1)],
+                                      ? [
+                                          const Color(0xFF59C639),
+                                          const Color(0xFF4CAF50)
+                                        ]
+                                      : [
+                                          Colors.white.withOpacity(0.3),
+                                          Colors.white.withOpacity(0.1)
+                                        ],
                                 ),
                               ),
                             ),
@@ -504,14 +624,22 @@ class _GardenPetHomeState extends State<GardenPetHome>
                             scrollDirection: Axis.horizontal,
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             children: [
-                              _buildCategoryButton("All", _selectedCategory == "All"),
-                              _buildCategoryButton("Common", _selectedCategory == "Common"),
-                              _buildCategoryButton("Uncommon", _selectedCategory == "Uncommon"),
-                              _buildCategoryButton("Rare", _selectedCategory == "Rare"),
-                              _buildCategoryButton("Legendary Egg", _selectedCategory == "Legendary Egg"),
-                              _buildCategoryButton("Mythical Egg", _selectedCategory == "Mythical Egg"),
-                              _buildCategoryButton("Bug Egg", _selectedCategory == "Bug Egg"),
-                              _buildCategoryButton("Bee Egg", _selectedCategory == "Bee Egg"),
+                              _buildCategoryButton(
+                                  "All", _selectedCategory == "All"),
+                              _buildCategoryButton(
+                                  "Common", _selectedCategory == "Common"),
+                              _buildCategoryButton(
+                                  "Uncommon", _selectedCategory == "Uncommon"),
+                              _buildCategoryButton(
+                                  "Rare", _selectedCategory == "Rare"),
+                              _buildCategoryButton("Legendary",
+                                  _selectedCategory == "Legendary"),
+                              _buildCategoryButton(
+                                  "Mythical", _selectedCategory == "Mythical"),
+                              _buildCategoryButton(
+                                  "Divine", _selectedCategory == "Divine"),
+                              _buildCategoryButton("Prismatic",
+                                  _selectedCategory == "Prismatic"),
                             ],
                           ),
                         ),
@@ -540,18 +668,15 @@ class _GardenPetHomeState extends State<GardenPetHome>
                       return Listener(
                         onPointerDown: (_) =>
                             setState(() => _pressedIndexes.add(originalIndex)),
-                        onPointerUp: (_) =>
-                            setState(() => _pressedIndexes.remove(originalIndex)),
-                        onPointerCancel: (_) =>
-                            setState(() => _pressedIndexes.remove(originalIndex)),
+                        onPointerUp: (_) => setState(
+                            () => _pressedIndexes.remove(originalIndex)),
+                        onPointerCancel: (_) => setState(
+                            () => _pressedIndexes.remove(originalIndex)),
                         child: AnimatedScale(
                           scale: isPressed ? 0.95 : 1.0,
                           duration: const Duration(milliseconds: 150),
                           child: GestureDetector(
-                            onTap: () => showImageDialog(
-                                petDetailImages[originalIndex], 
-                                petNames[originalIndex],
-                                petRarities[originalIndex]),
+                            onTap: () => showImageDialog(pets[originalIndex]),
                             child: Container(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -569,7 +694,8 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF7B3F00).withOpacity(0.18),
+                                    color: const Color(0xFF7B3F00)
+                                        .withOpacity(0.18),
                                     blurRadius: 16,
                                     spreadRadius: 2,
                                     offset: const Offset(0, 6),
@@ -587,22 +713,26 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(16),
                                         child: Image.asset(
-                                          galleryImages[originalIndex],
+                                          pets[originalIndex].image,
                                           width: double.infinity,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) =>
-                                              const Icon(Icons.error, size: 40, color: Colors.white),
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  const Icon(Icons.error,
+                                                      size: 40,
+                                                      color: Colors.white),
                                         ),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
                                     child: Column(
                                       children: [
                                         Text(
-                                          petNames[originalIndex],
+                                          pets[originalIndex].name,
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -612,21 +742,26 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                         ),
                                         const SizedBox(height: 6),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
                                           decoration: BoxDecoration(
-                                            color: _getRarityColors(petRarities[originalIndex])[0],
-                                            borderRadius: BorderRadius.circular(8),
+                                            color: _getRarityColors(
+                                                pets[originalIndex].tier)[0],
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                             border: Border.all(
-                                              color: _getRarityColors(petRarities[originalIndex])[1],
+                                              color: _getRarityColors(
+                                                  pets[originalIndex].tier)[1],
                                               width: 2,
                                             ),
                                           ),
                                           child: FittedBox(
                                             fit: BoxFit.scaleDown,
                                             child: ConstrainedBox(
-                                              constraints: const BoxConstraints(minWidth: 75),
+                                              constraints: const BoxConstraints(
+                                                  minWidth: 75),
                                               child: Text(
-                                                petRarities[originalIndex],
+                                                pets[originalIndex].tier,
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   color: Colors.white,
@@ -675,31 +810,33 @@ class _GardenPetHomeState extends State<GardenPetHome>
       case "Rare":
         iconData = Icons.star;
         break;
-      case "Legendary Egg":
+      case "Legendary":
         iconData = Icons.egg_outlined;
         iconColor = Color(0xFFFFD700); // Gold
         break;
-      case "Mythical Egg":
+      case "Mythical":
         iconData = Icons.egg_outlined;
         break;
-      case "Bug Egg":
-        iconData = Icons.bug_report;
+      case "Divine":
+        iconData = Icons.emoji_nature;
         break;
-      case "Bee Egg":
+      case "Prismatic":
         iconData = Icons.emoji_nature;
         break;
       default:
         iconData = Icons.category;
     }
-    
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF59C639) : Colors.black.withOpacity(0.2),
+        color:
+            isActive ? const Color(0xFF59C639) : Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isActive ? Colors.green.shade700 : Colors.white.withOpacity(0.1),
+          color:
+              isActive ? Colors.green.shade700 : Colors.white.withOpacity(0.1),
           width: 2,
         ),
       ),
@@ -720,13 +857,14 @@ class _GardenPetHomeState extends State<GardenPetHome>
               children: [
                 Icon(
                   iconData,
-                  color: iconColor ?? (isActive ? Colors.white : Colors.white70),
+                  color:
+                      iconColor ?? (isActive ? Colors.white : Colors.white70),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   label,
-          style: TextStyle(
+                  style: TextStyle(
                     color: isActive ? Colors.white : Colors.white70,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -736,6 +874,199 @@ class _GardenPetHomeState extends State<GardenPetHome>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // Update showImageDialog to accept PetInfo and show a detailed card
+  void showImageDialog(PetInfo pet) {
+    _scaleController.forward();
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(12),
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.0, end: 1.0).animate(
+            CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
+          ),
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 340),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF234022),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFF4CAF50), width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.18),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Stack(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 6), // match Info bar
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF5DA25A),
+                                borderRadius:
+                                    BorderRadius.circular(6), // match Info bar
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text(
+                                    pet.name,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  if (pet.box != null) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF4CAF50),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Text(
+                                        pet.box!,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: IconButton(
+                            icon: const Icon(Icons.close,
+                                color: Colors.white, size: 24),
+                            onPressed: () => Navigator.of(context).pop(),
+                            tooltip: 'Close',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        pet.detailImage,
+                        width: 140,
+                        height: 140,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF5DA25A),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        pet.description,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF5DA25A),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Info',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    _infoRow('Tier', pet.tier),
+                    _infoRow('Obtaining method', pet.obtainingMethod,
+                        highlight: true),
+                    _infoRow('Hatch Chance', pet.hatchChance),
+                    _infoRow('Passive', pet.passive),
+                    _infoRow('Obtainable?', pet.obtainable),
+                    _infoRow('Date Added', pet.dateAdded),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ).then((_) => _scaleController.reset());
+  }
+
+  Widget _infoRow(String label, String value, {bool highlight = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: highlight ? Colors.yellow[600] : Colors.white,
+                fontWeight: highlight ? FontWeight.bold : FontWeight.normal,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
