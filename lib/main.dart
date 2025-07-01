@@ -15,6 +15,7 @@ class PetInfo {
   final String obtainable;
   final String dateAdded;
   final String? box;
+  final String? hunger;
 
   PetInfo({
     required this.name,
@@ -28,6 +29,7 @@ class PetInfo {
     required this.obtainable,
     required this.dateAdded,
     this.box,
+    this.hunger,
   });
 }
 
@@ -78,6 +80,8 @@ class _GardenPetHomeState extends State<GardenPetHome>
   late AnimationController _fadeController;
   late AnimationController _scaleController;
   String _selectedCategory = "All"; // Track selected category as "All"
+  int _petPage = 0;
+  static const int petsPerPage = 6;
 
   final List<String> imageAssets = [
     'assets/roblox 1.png',
@@ -234,19 +238,29 @@ class _GardenPetHomeState extends State<GardenPetHome>
             .where((entry) => pets[entry.key].tier.toLowerCase() == 'divine')
             .map((entry) => entry.key)
             .toList();
-      case "Prismatic":
-        // Show pets with Prismatic tier
-        return pets
-            .asMap()
-            .entries
-            .where((entry) => pets[entry.key].tier.toLowerCase() == 'prismatic')
-            .map((entry) => entry.key)
-            .toList();
       case "All":
       default:
-        // Show all pets
-        return List.generate(pets.length, (index) => index);
+        // Group all Divine pets (including Queen Bee) together at the end
+        final nonDivine = <int>[];
+        final divine = <int>[];
+        for (var i = 0; i < pets.length; i++) {
+          if (pets[i].tier.toLowerCase() == 'divine') {
+            divine.add(i);
+          } else {
+            nonDivine.add(i);
+          }
+        }
+        return [...nonDivine, ...divine];
     }
+  }
+
+  List<int> _getPagedPetIndexes() {
+    final filtered = _getFilteredPetIndexes();
+    final start = _petPage * petsPerPage;
+    final end = (start + petsPerPage) > filtered.length
+        ? filtered.length
+        : (start + petsPerPage);
+    return filtered.sublist(start, end);
   }
 
   List<Color> _getRarityColors(String rarity) {
@@ -281,7 +295,7 @@ class _GardenPetHomeState extends State<GardenPetHome>
       image: 'assets/queen bee.png',
       detailImage: 'assets/queenbee11.png',
       description: 'A Queen Bee',
-      tier: 'Rare',
+      tier: 'Divine',
       obtainingMethod: 'Bee Egg',
       hatchChance: '25%',
       passive: 'Honey Maker: Produces honey over time',
@@ -352,56 +366,305 @@ class _GardenPetHomeState extends State<GardenPetHome>
       dateAdded: 'June 21, 2025',
     ),
     PetInfo(
-      name: 'Duck',
-      image: 'assets/duck.png',
-      detailImage: 'assets/duck_big.png',
-      description: 'A swimming Duck',
-      tier: 'Common',
-      obtainingMethod: 'Water Egg',
-      hatchChance: '50%',
-      passive: 'Water Walker: Can walk on water',
+      name: 'Bee',
+      image: 'assets/bee.png',
+      detailImage: 'assets/bee.png',
+      description: 'The Bee',
+      tier: 'Uncommon',
+      obtainingMethod: 'Bee Egg',
+      hatchChance: '65%',
+      passive:
+          'Every ~25m, flies to a nearby fruit and pollinates it, applying the Pollinated mutation.',
       obtainable: 'Yes',
-      dateAdded: 'June 14, 2025',
+      dateAdded: 'May 31, 2025',
+      box: null,
+      hunger: '25,000',
     ),
     PetInfo(
-      name: 'Horse',
-      image: 'assets/horse.png',
-      detailImage: 'assets/horse_big.png',
-      description: 'A strong Horse',
-      tier: 'Divine',
-      obtainingMethod: 'Farm Egg',
+      name: 'Black Bunny',
+      image: 'assets/black bunny.png',
+      detailImage: 'assets/black bunny.png',
+      description: 'The Black Bunny.',
+      tier: 'Uncommon',
+      obtainingMethod: 'Uncommon Egg',
       hatchChance: '25%',
-      passive: 'Speed Runner: Very fast movement',
+      passive:
+          'Every 40 seconds, the Black Bunny searches for a Carrot on the garden and eats it, automatically selling it at a marked up price of 1.5x value.',
       obtainable: 'Yes',
-      dateAdded: 'June 13, 2025',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
     ),
     PetInfo(
       name: 'Chicken',
       image: 'assets/chicken.png',
-      detailImage: 'assets/chicken_big.png',
-      description: 'A farm Chicken',
-      tier: 'Common',
-      obtainingMethod: 'Farm Egg',
-      hatchChance: '60%',
-      passive: 'Egg Layer: Lays eggs daily',
+      detailImage: 'assets/chicken.png',
+      description: 'The Chicken.',
+      tier: 'Uncommon',
+      obtainingMethod: 'Uncommon Egg',
+      hatchChance: '25%',
+      passive: 'Increases egg hatch speed by 10%.',
       obtainable: 'Yes',
-      dateAdded: 'June 12, 2025',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
     ),
     PetInfo(
-      name: 'Hedgehog',
-      image: 'assets/hedgehog.png',
-      detailImage: 'assets/hedgehog_big.png',
-      description: 'A spiky Hedgehog',
-      tier: 'Prismatic',
-      obtainingMethod: 'Forest Egg',
-      hatchChance: '40%',
-      passive: 'Spike Shield: Protects from damage',
+      name: 'Cat',
+      image: 'assets/moon cat.png',
+      detailImage: 'assets/moon cat.png',
+      description: 'The Cat.',
+      tier: 'Uncommon',
+      obtainingMethod: 'Uncommon Egg',
+      hatchChance: '25%',
+      passive:
+          'Every 80 seconds, the Cat will nap for 10 seconds. New fruit within 10 studs will be 1.25x larger.',
       obtainable: 'Yes',
-      dateAdded: 'June 11, 2025',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Deer',
+      image: 'assets/deer.png',
+      detailImage: 'assets/deer.png',
+      description: 'The Deer.',
+      tier: 'Uncommon',
+      obtainingMethod: 'Uncommon Egg',
+      hatchChance: '25%',
+      passive: 'Gives a 3% chance for berry plants to stay when harvested.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
+      hunger: '2,500',
+    ),
+    PetInfo(
+      name: 'Monkey',
+      image: 'assets/monkey.png',
+      detailImage: 'assets/monkey.png',
+      description: 'The Monkey.',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Egg',
+      hatchChance: '8.33%',
+      passive:
+          '~2.5% to refund fruit back to your inventory. Rarer plants have a lower chance to refund.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3, 2025',
+      box: null,
+      hunger: '7,400',
+    ),
+    PetInfo(
+      name: 'Orange Tabby',
+      image: 'assets/orange tabby.png',
+      detailImage: 'assets/orange tabby.png',
+      description: 'The Orange Tabby.',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Egg',
+      hatchChance: '33.33%',
+      passive:
+          'Every 90 seconds, naps for 15 seconds and causes new fruit within 15 studs to grow 1.5x larger.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Pig',
+      image: 'assets/pig.png',
+      detailImage: 'assets/pig.png',
+      description: 'The Pig.',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Egg',
+      hatchChance: '16.67%',
+      passive:
+          'Every 118 seconds, the pig emits a 15 second aura that grants a 2x chance for plants within 15 studs to grow variant fruits.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Rooster',
+      image: 'assets/rooster.png',
+      detailImage: 'assets/rooster.png',
+      description: 'The Rooster.',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Egg',
+      hatchChance: '16.67%',
+      passive: 'Increases egg hatch speed by ~20%.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Spotted Deer',
+      image: 'assets/spotted deer.png',
+      detailImage: 'assets/spotted deer.png',
+      description: 'The Spotted Deer.',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Egg',
+      hatchChance: '25%',
+      passive: 'Gives a 5% chance for berry plants to stay when harvested.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3rd, 2025',
+      box: null,
+      hunger: '2,500',
+    ),
+    PetInfo(
+      name: 'Flamingo',
+      image: 'assets/flamingo.png',
+      detailImage: 'assets/flamingo.png',
+      description: 'A Flamingo',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Summer Egg',
+      hatchChance: '30%',
+      passive:
+          'Flamboyance: Occasionally stands on one leg and all nearby plants will grow incredibly fast',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Toucan',
+      image: 'assets/toucan.png',
+      detailImage: 'assets/toucan.png',
+      description: 'A Toucan',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Summer Egg',
+      hatchChance: '25%',
+      passive:
+          'Tropical Lover: Makes all nearby Tropical type plants have increased variant chance and grow bigger',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Sea Turtle',
+      image: 'assets/sea turtle.png',
+      detailImage: 'assets/sea turtle.png',
+      description: 'A Sea Turtle',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Summer Egg',
+      hatchChance: '20%',
+      passive:
+          'Shell Share: Occasionally shares its wisdom to a random active pet granting bonus experience & Water Splash: Occasionally has a chance to Wet a nearby fruit',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Orangutan',
+      image: 'assets/orangutan.png',
+      detailImage: 'assets/orangutan.png',
+      description: 'An Orangutan',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Summer Egg',
+      hatchChance: '15%',
+      passive:
+          'Helping Hands: When crafting, each material has a chance for it not to be consumed',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Seal',
+      image: 'assets/seal.png',
+      detailImage: 'assets/seal.png',
+      description: 'A Seal',
+      tier: 'Rare',
+      obtainingMethod: 'Rare Summer Egg',
+      hatchChance: '10%',
+      passive:
+          'Seal the Deal: When selling pets, has a 2.42% chance to get the pet back as its egg equivalent',
+      obtainable: 'Yes',
+      dateAdded: 'June 21, 2025',
+      box: null,
+      hunger: '17,000',
+    ),
+    PetInfo(
+      name: 'Honey Bee',
+      image: 'assets/honey bee.png',
+      detailImage: 'assets/honey bee.png',
+      description: 'The Honey Bee.',
+      tier: 'Rare',
+      obtainingMethod: 'Bee Egg',
+      hatchChance: '25%',
+      passive:
+          'Every ~20m, flies to a nearby fruit and pollinates it, applying the Pollinated mutation. (The time is reduced when the pet is leveled up)',
+      obtainable: 'Yes',
+      dateAdded: 'May 31, 2025',
+      box: null,
+      hunger: '25,000',
+    ),
+    PetInfo(
+      name: 'Wasp',
+      image: 'assets/wasp.png',
+      detailImage: 'assets/wasp.png',
+      description: 'The Wasp.',
+      tier: 'Rare',
+      obtainingMethod: 'Anti Bee Egg',
+      hatchChance: '55%',
+      passive:
+          'Every 30m, the Wasp flies to a nearby fruit and pollinates it, applying the Pollinated mutation. Every 10m, the Wasp stings a random pet and advances its ability cooldown by 60s.',
+      obtainable: 'Yes',
+      dateAdded: 'June 7th, 2025',
+      box: null,
+    ),
+    PetInfo(
+      name: 'Disco Bee',
+      image: 'assets/disco bee.png',
+      detailImage: 'assets/disco bee.png',
+      description: 'The Disco Bee.',
+      tier: 'Divine',
+      obtainingMethod: 'Anti Bee Egg',
+      hatchChance: '0.25%',
+      passive: 'Every ~13m, ~22% chance a nearby fruit becomes Disco',
+      obtainable: 'Yes',
+      dateAdded: 'June 7th, 2025',
+      box: null,
+      hunger: '25,000',
+    ),
+    PetInfo(
+      name: 'Raccoon',
+      image: 'assets/raccoon.png',
+      detailImage: 'assets/raccoon.png',
+      description: 'The Raccoon.',
+      tier: 'Divine',
+      obtainingMethod: 'Night Egg',
+      hatchChance: 'Night Egg 0.1%\nExotic Night Egg 1%',
+      passive:
+          'Every ~15 minutes, goes to another player\'s plot and steals (duplicate) a random crop and gives it to the player!',
+      obtainable: 'Yes',
+      dateAdded: 'May 10, 2025',
+      box: null,
+      hunger: '45,000',
+    ),
+    PetInfo(
+      name: 'Dragonfly',
+      image: 'assets/dragonfly.png',
+      detailImage: 'assets/dragonfly.png',
+      description: 'The Dragonfly.',
+      tier: 'Divine',
+      obtainingMethod: 'Bug Egg',
+      hatchChance: '1%',
+      passive:
+          'Transmutation: Every ~5 minutes, one random crop will turn gold.',
+      obtainable: 'Yes',
+      dateAdded: 'May 3, 2025',
+      box: null,
+      hunger: '100,000',
+    ),
+    PetInfo(
+      name: 'Night Owl',
+      image: 'assets/night owl.png',
+      detailImage: 'assets/night owl.png',
+      description: 'The Night Owl.',
+      tier: 'Divine',
+      obtainingMethod: 'Night Egg',
+      hatchChance: '4%',
+      passive: 'All active pets gain an additional <0.23 XP per second.',
+      obtainable: 'Yes',
+      dateAdded: 'May 10th, 2025',
+      box: null,
+      hunger: '50,000',
     ),
   ];
 
-  // Update the pet grid to use pets list
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -638,8 +901,6 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                   "Mythical", _selectedCategory == "Mythical"),
                               _buildCategoryButton(
                                   "Divine", _selectedCategory == "Divine"),
-                              _buildCategoryButton("Prismatic",
-                                  _selectedCategory == "Prismatic"),
                             ],
                           ),
                         ),
@@ -661,8 +922,8 @@ class _GardenPetHomeState extends State<GardenPetHome>
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final filteredIndexes = _getFilteredPetIndexes();
-                      final originalIndex = filteredIndexes[index];
+                      final pagedIndexes = _getPagedPetIndexes();
+                      final originalIndex = pagedIndexes[index];
                       final isPressed = _pressedIndexes.contains(originalIndex);
 
                       return Listener(
@@ -783,8 +1044,54 @@ class _GardenPetHomeState extends State<GardenPetHome>
                         ),
                       );
                     },
-                    childCount: _getFilteredPetIndexes().length,
+                    childCount: _getPagedPetIndexes().length,
                   ),
+                ),
+              ),
+              // Pagination buttons
+              SliverToBoxAdapter(
+                child: Builder(
+                  builder: (context) {
+                    final filtered = _getFilteredPetIndexes();
+                    final pageCount = (filtered.length / petsPerPage).ceil();
+                    if (pageCount <= 1) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                            pageCount,
+                            (i) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 4),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: _petPage == i
+                                          ? const Color(0xFF4CAF50)
+                                          : Colors.grey[700],
+                                      minimumSize: const Size(36, 36),
+                                      padding: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _petPage = i;
+                                      });
+                                    },
+                                    child: Text(
+                                      "${i + 1}",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -820,9 +1127,6 @@ class _GardenPetHomeState extends State<GardenPetHome>
       case "Divine":
         iconData = Icons.emoji_nature;
         break;
-      case "Prismatic":
-        iconData = Icons.emoji_nature;
-        break;
       default:
         iconData = Icons.category;
     }
@@ -848,6 +1152,7 @@ class _GardenPetHomeState extends State<GardenPetHome>
           onTap: () {
             setState(() {
               _selectedCategory = label;
+              _petPage = 0;
             });
           },
           child: Padding(
