@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'pet_collection.dart';
+import 'egg_hatching_guide.dart';
 
-// PetInfo class at top-level
 class PetInfo {
   final String name;
   final String image;
@@ -82,6 +83,8 @@ class _GardenPetHomeState extends State<GardenPetHome>
   String _selectedCategory = "All"; // Track selected category as "All"
   int _petPage = 0;
   static const int petsPerPage = 6;
+  Set<int> _collectedPetIndexes = {};
+  Set<int> _favoritePetIndexes = {};
 
   final List<String> imageAssets = [
     'assets/roblox 1.png',
@@ -101,7 +104,6 @@ class _GardenPetHomeState extends State<GardenPetHome>
     'assets/dog1.png',
     'assets/seagul.png',
     'assets/duck.png',
-    'assets/horse.png',
     'assets/chicken.png',
     'assets/hedgehog.png',
   ];
@@ -696,95 +698,73 @@ class _GardenPetHomeState extends State<GardenPetHome>
         ),
         centerTitle: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => Dialog(
-                    backgroundColor: Colors.transparent,
-                    insetPadding: const EdgeInsets.all(24),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFF8B4513),
-                            Color(0xFFA0522D),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: Color(0xFFF5DEB3), width: 2),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'How to Use',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Click any pet box below to view its information.',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                backgroundColor: const Color(0xFFF5DEB3),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: const Text(
-                                'OK',
-                                style: TextStyle(
-                                  color: Color(0xFF8B4513),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+          PopupMenuButton<int>(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            color: const Color(0xFFE8F5E9),
+            onSelected: (value) async {
+              if (value == 0) {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => EggHatchingGuidePage(pets: pets),
+                  ),
+                );
+              } else if (value == 1) {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => PetCollectionProgressPage(
+                      pets: pets,
+                      collectedIndexes: _collectedPetIndexes,
+                      onCollectionChanged: (updated) {
+                        setState(() {
+                          _collectedPetIndexes = Set<int>.from(updated);
+                        });
+                      },
                     ),
                   ),
                 );
-              },
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: const Color(0x804CAF50), // semi-transparent green
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Color(0xFFF5DEB3), width: 1.5),
-                ),
-                child: const Center(
-                  child: Text(
-                    'i',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
+              } else if (value == 2) {
+                final favoritePets =
+                    _favoritePetIndexes.map((i) => pets[i]).toList();
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        FavoritePetPage(favoritePets: favoritePets),
                   ),
+                );
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 0,
+                child: Row(
+                  children: [
+                    Icon(Icons.egg_rounded, color: Color(0xFF4CAF50)),
+                    const SizedBox(width: 10),
+                    const Text('Egg & Hatching Guide'),
+                  ],
                 ),
               ),
-            ),
+              PopupMenuItem(
+                value: 1,
+                child: Row(
+                  children: [
+                    Icon(Icons.emoji_events_rounded, color: Color(0xFFFFD700)),
+                    const SizedBox(width: 10),
+                    const Text('Collection Progress'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: Row(
+                  children: [
+                    Icon(Icons.favorite, color: Colors.redAccent),
+                    const SizedBox(width: 10),
+                    const Text('Favorite Pets'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -925,6 +905,8 @@ class _GardenPetHomeState extends State<GardenPetHome>
                       final pagedIndexes = _getPagedPetIndexes();
                       final originalIndex = pagedIndexes[index];
                       final isPressed = _pressedIndexes.contains(originalIndex);
+                      final isFavorite =
+                          _favoritePetIndexes.contains(originalIndex);
 
                       return Listener(
                         onPointerDown: (_) =>
@@ -971,18 +953,49 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: Image.asset(
-                                          pets[originalIndex].image,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            child: Image.asset(
+                                              pets[originalIndex].image,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error,
+                                                      stackTrace) =>
                                                   const Icon(Icons.error,
                                                       size: 40,
                                                       color: Colors.white),
-                                        ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 4,
+                                            right: 4,
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  if (isFavorite) {
+                                                    _favoritePetIndexes
+                                                        .remove(originalIndex);
+                                                  } else {
+                                                    _favoritePetIndexes
+                                                        .add(originalIndex);
+                                                  }
+                                                });
+                                              },
+                                              child: Icon(
+                                                isFavorite
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color: isFavorite
+                                                    ? Colors.redAccent
+                                                    : Colors.white70,
+                                                size: 28,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -1373,6 +1386,101 @@ class _GardenPetHomeState extends State<GardenPetHome>
           ),
         ],
       ),
+    );
+  }
+}
+
+class FavoritePetPage extends StatelessWidget {
+  final List<PetInfo> favoritePets;
+  const FavoritePetPage({super.key, required this.favoritePets});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF4CAF50),
+        title:
+            const Text('Favorite Pets', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      backgroundColor: const Color(0xFF1A1A2E),
+      body: favoritePets.isEmpty
+          ? const Center(
+              child: Text('No favorite pets yet.',
+                  style: TextStyle(color: Colors.white70, fontSize: 18)),
+            )
+          : ListView.builder(
+              itemCount: favoritePets.length,
+              itemBuilder: (context, i) {
+                final pet = favoritePets[i];
+                return Card(
+                  color: const Color(0xFF234022),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            pet.image,
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            errorBuilder: (c, e, s) =>
+                                const Icon(Icons.error, color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                pet.name,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade700,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  pet.tier,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                pet.description,
+                                style: const TextStyle(
+                                    color: Colors.white70, fontSize: 15),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
