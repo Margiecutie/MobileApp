@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'pet_collection.dart';
 import 'egg_hatching_guide.dart';
 
 class PetInfo {
@@ -77,14 +76,9 @@ class _GardenPetHomeState extends State<GardenPetHome>
   int _currentPage = 0;
   late Timer _timer;
   final PageController _pageController = PageController();
-  final Set<int> _pressedIndexes = {};
-  late AnimationController _fadeController;
-  late AnimationController _scaleController;
   String _selectedCategory = "All"; // Track selected category as "All"
   int _petPage = 0;
   static const int petsPerPage = 6;
-  Set<int> _collectedPetIndexes = {};
-  Set<int> _favoritePetIndexes = {};
 
   final List<String> imageAssets = [
     'assets/roblox 1.png',
@@ -159,17 +153,6 @@ class _GardenPetHomeState extends State<GardenPetHome>
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _fadeController.forward();
-
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
       final next = (_currentPage + 1) % imageAssets.length;
       _pageController.animateToPage(
@@ -184,8 +167,6 @@ class _GardenPetHomeState extends State<GardenPetHome>
   void dispose() {
     _timer.cancel();
     _pageController.dispose();
-    _fadeController.dispose();
-    _scaleController.dispose();
     super.dispose();
   }
 
@@ -295,7 +276,7 @@ class _GardenPetHomeState extends State<GardenPetHome>
     PetInfo(
       name: 'Queen Bee',
       image: 'assets/queen bee.png',
-      detailImage: 'assets/queenbee11.png',
+      detailImage: 'assets/queen bee.png',
       description: 'A Queen Bee',
       tier: 'Divine',
       obtainingMethod: 'Bee Egg',
@@ -698,73 +679,16 @@ class _GardenPetHomeState extends State<GardenPetHome>
         ),
         centerTitle: true,
         actions: [
-          PopupMenuButton<int>(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            color: const Color(0xFFE8F5E9),
-            onSelected: (value) async {
-              if (value == 0) {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => EggHatchingGuidePage(pets: pets),
-                  ),
-                );
-              } else if (value == 1) {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => PetCollectionProgressPage(
-                      pets: pets,
-                      collectedIndexes: _collectedPetIndexes,
-                      onCollectionChanged: (updated) {
-                        setState(() {
-                          _collectedPetIndexes = Set<int>.from(updated);
-                        });
-                      },
-                    ),
-                  ),
-                );
-              } else if (value == 2) {
-                final favoritePets =
-                    _favoritePetIndexes.map((i) => pets[i]).toList();
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        FavoritePetPage(favoritePets: favoritePets),
-                  ),
-                );
-              }
+          IconButton(
+            icon: const Icon(Icons.egg_outlined, color: Colors.white),
+            tooltip: 'Egg Hatching Guide',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EggHatchingGuidePage(pets: pets),
+                ),
+              );
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 0,
-                child: Row(
-                  children: [
-                    Icon(Icons.egg_rounded, color: Color(0xFF4CAF50)),
-                    const SizedBox(width: 10),
-                    const Text('Egg & Hatching Guide'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: Row(
-                  children: [
-                    Icon(Icons.emoji_events_rounded, color: Color(0xFFFFD700)),
-                    const SizedBox(width: 10),
-                    const Text('Collection Progress'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 2,
-                child: Row(
-                  children: [
-                    Icon(Icons.favorite, color: Colors.redAccent),
-                    const SizedBox(width: 10),
-                    const Text('Favorite Pets'),
-                  ],
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -785,107 +709,104 @@ class _GardenPetHomeState extends State<GardenPetHome>
             slivers: [
               // Hero Carousel Section
               SliverToBoxAdapter(
-                child: FadeTransition(
-                  opacity: _fadeController,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 24),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 250,
-                          child: PageView.builder(
-                            controller: _pageController,
-                            itemCount: imageAssets.length,
-                            onPageChanged: (i) =>
-                                setState(() => _currentPage = i),
-                            itemBuilder: (context, index) {
-                              return AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(
-                                      color: Color(0xFFF5DEB3),
-                                      width: 2,
-                                    ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 24),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 250,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: imageAssets.length,
+                          onPageChanged: (i) =>
+                              setState(() => _currentPage = i),
+                          itemBuilder: (context, index) {
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: Color(0xFFF5DEB3),
+                                    width: 2,
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(24),
-                                    child: Image.asset(
-                                      imageAssets[index],
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      errorBuilder: (c, e, s) => const Center(
-                                        child: Icon(
-                                          Icons.error,
-                                          color: Colors.white,
-                                          size: 40,
-                                        ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Image.asset(
+                                    imageAssets[index],
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder: (c, e, s) => const Center(
+                                      child: Icon(
+                                        Icons.error,
+                                        color: Colors.white,
+                                        size: 40,
                                       ),
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
                         ),
-                        const SizedBox(height: 20),
-                        // Dots Indicator
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            imageAssets.length,
-                            (i) => AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 6),
-                              width: _currentPage == i ? 24 : 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                gradient: LinearGradient(
-                                  colors: _currentPage == i
-                                      ? [
-                                          const Color(0xFF59C639),
-                                          const Color(0xFF4CAF50)
-                                        ]
-                                      : [
-                                          Colors.white.withOpacity(0.3),
-                                          Colors.white.withOpacity(0.1)
-                                        ],
-                                ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Dots Indicator
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          imageAssets.length,
+                          (i) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                            width: _currentPage == i ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              gradient: LinearGradient(
+                                colors: _currentPage == i
+                                    ? [
+                                        const Color(0xFF59C639),
+                                        const Color(0xFF4CAF50)
+                                      ]
+                                    : [
+                                        Colors.white.withOpacity(0.3),
+                                        Colors.white.withOpacity(0.1)
+                                      ],
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        // Category Button Bar directly below carousel
-                        SizedBox(
-                          height: 56,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            children: [
-                              _buildCategoryButton(
-                                  "All", _selectedCategory == "All"),
-                              _buildCategoryButton(
-                                  "Common", _selectedCategory == "Common"),
-                              _buildCategoryButton(
-                                  "Uncommon", _selectedCategory == "Uncommon"),
-                              _buildCategoryButton(
-                                  "Rare", _selectedCategory == "Rare"),
-                              _buildCategoryButton("Legendary",
-                                  _selectedCategory == "Legendary"),
-                              _buildCategoryButton(
-                                  "Mythical", _selectedCategory == "Mythical"),
-                              _buildCategoryButton(
-                                  "Divine", _selectedCategory == "Divine"),
-                            ],
-                          ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Category Button Bar directly below carousel
+                      SizedBox(
+                        height: 56,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          children: [
+                            _buildCategoryButton(
+                                "All", _selectedCategory == "All"),
+                            _buildCategoryButton(
+                                "Common", _selectedCategory == "Common"),
+                            _buildCategoryButton(
+                                "Uncommon", _selectedCategory == "Uncommon"),
+                            _buildCategoryButton(
+                                "Rare", _selectedCategory == "Rare"),
+                            _buildCategoryButton(
+                                "Legendary", _selectedCategory == "Legendary"),
+                            _buildCategoryButton(
+                                "Mythical", _selectedCategory == "Mythical"),
+                            _buildCategoryButton(
+                                "Divine", _selectedCategory == "Divine"),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -904,155 +825,110 @@ class _GardenPetHomeState extends State<GardenPetHome>
                     (context, index) {
                       final pagedIndexes = _getPagedPetIndexes();
                       final originalIndex = pagedIndexes[index];
-                      final isPressed = _pressedIndexes.contains(originalIndex);
-                      final isFavorite =
-                          _favoritePetIndexes.contains(originalIndex);
 
-                      return Listener(
-                        onPointerDown: (_) =>
-                            setState(() => _pressedIndexes.add(originalIndex)),
-                        onPointerUp: (_) => setState(
-                            () => _pressedIndexes.remove(originalIndex)),
-                        onPointerCancel: (_) => setState(
-                            () => _pressedIndexes.remove(originalIndex)),
-                        child: AnimatedScale(
-                          scale: isPressed ? 0.95 : 1.0,
-                          duration: const Duration(milliseconds: 150),
-                          child: GestureDetector(
-                            onTap: () => showImageDialog(pets[originalIndex]),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    const Color(0xFF8B4513),
-                                    const Color(0xFFA0522D),
+                      return GestureDetector(
+                        onTap: () => showImageDialog(pets[originalIndex]),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                const Color(0xFF8B4513),
+                                const Color(0xFFA0522D),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    const Color(0xFF7B3F00).withOpacity(0.18),
+                                blurRadius: 16,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  margin: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.asset(
+                                        pets[originalIndex].image,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(Icons.error,
+                                                    size: 40,
+                                                    color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      pets[originalIndex].name,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: _getRarityColors(
+                                            pets[originalIndex].tier)[0],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: _getRarityColors(
+                                              pets[originalIndex].tier)[1],
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                              minWidth: 75),
+                                          child: Text(
+                                            pets[originalIndex].tier,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF7B3F00)
-                                        .withOpacity(0.18),
-                                    blurRadius: 16,
-                                    spreadRadius: 2,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
                               ),
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      margin: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                            child: Image.asset(
-                                              pets[originalIndex].image,
-                                              width: double.infinity,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error,
-                                                      stackTrace) =>
-                                                  const Icon(Icons.error,
-                                                      size: 40,
-                                                      color: Colors.white),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 4,
-                                            right: 4,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  if (isFavorite) {
-                                                    _favoritePetIndexes
-                                                        .remove(originalIndex);
-                                                  } else {
-                                                    _favoritePetIndexes
-                                                        .add(originalIndex);
-                                                  }
-                                                });
-                                              },
-                                              child: Icon(
-                                                isFavorite
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
-                                                color: isFavorite
-                                                    ? Colors.redAccent
-                                                    : Colors.white70,
-                                                size: 28,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          pets[originalIndex].name,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: _getRarityColors(
-                                                pets[originalIndex].tier)[0],
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            border: Border.all(
-                                              color: _getRarityColors(
-                                                  pets[originalIndex].tier)[1],
-                                              width: 2,
-                                            ),
-                                          ),
-                                          child: FittedBox(
-                                            fit: BoxFit.scaleDown,
-                                            child: ConstrainedBox(
-                                              constraints: const BoxConstraints(
-                                                  minWidth: 75),
-                                              child: Text(
-                                                pets[originalIndex].tier,
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            ],
                           ),
                         ),
                       );
@@ -1198,162 +1074,156 @@ class _GardenPetHomeState extends State<GardenPetHome>
 
   // Update showImageDialog to accept PetInfo and show a detailed card
   void showImageDialog(PetInfo pet) {
-    _scaleController.forward();
     showDialog(
       context: context,
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.all(12),
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-            CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
-          ),
-          child: Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 340),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFF234022),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFF4CAF50), width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.18),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Stack(
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 6), // match Info bar
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF5DA25A),
-                                borderRadius:
-                                    BorderRadius.circular(6), // match Info bar
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Text(
-                                    pet.name,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 340),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF234022),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF4CAF50), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.18),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    children: [
+                      Column(
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 6), // match Info bar
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF5DA25A),
+                              borderRadius:
+                                  BorderRadius.circular(6), // match Info bar
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Text(
+                                  pet.name,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                if (pet.box != null) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF4CAF50),
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: Text(
+                                      pet.box!,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
                                     ),
                                   ),
-                                  if (pet.box != null) ...[
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF4CAF50),
-                                        borderRadius: BorderRadius.circular(14),
-                                      ),
-                                      child: Text(
-                                        pet.box!,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
                                 ],
-                              ),
+                              ],
                             ),
-                            const SizedBox(height: 10),
-                          ],
-                        ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: IconButton(
-                            icon: const Icon(Icons.close,
-                                color: Colors.white, size: 24),
-                            onPressed: () => Navigator.of(context).pop(),
-                            tooltip: 'Close',
                           ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.close,
+                              color: Colors.white, size: 24),
+                          onPressed: () => Navigator.of(context).pop(),
+                          tooltip: 'Close',
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        pet.detailImage,
-                        width: 140,
-                        height: 140,
-                        fit: BoxFit.contain,
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      pet.detailImage,
+                      width: 140,
+                      height: 140,
+                      fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 6),
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 2),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5DA25A),
-                        borderRadius: BorderRadius.circular(8),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF5DA25A),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      pet.description,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF5DA25A),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Center(
                       child: Text(
-                        pet.description,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        'Info',
+                        style: TextStyle(
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5DA25A),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Info',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          color: Colors.white,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 7),
-                    _infoRow('Tier', pet.tier),
-                    _infoRow('Obtaining method', pet.obtainingMethod,
-                        highlight: true),
-                    _infoRow('Hatch Chance', pet.hatchChance),
-                    _infoRow('Passive', pet.passive),
-                    _infoRow('Obtainable?', pet.obtainable),
-                    _infoRow('Date Added', pet.dateAdded),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 7),
+                  _infoRow('Tier', pet.tier),
+                  _infoRow('Obtaining method', pet.obtainingMethod,
+                      highlight: true),
+                  _infoRow('Hatch Chance', pet.hatchChance),
+                  _infoRow('Passive', pet.passive),
+                  _infoRow('Obtainable?', pet.obtainable),
+                  _infoRow('Date Added', pet.dateAdded),
+                ],
               ),
             ),
           ),
         ),
       ),
-    ).then((_) => _scaleController.reset());
+    );
   }
 
   Widget _infoRow(String label, String value, {bool highlight = false}) {
@@ -1386,101 +1256,6 @@ class _GardenPetHomeState extends State<GardenPetHome>
           ),
         ],
       ),
-    );
-  }
-}
-
-class FavoritePetPage extends StatelessWidget {
-  final List<PetInfo> favoritePets;
-  const FavoritePetPage({super.key, required this.favoritePets});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF4CAF50),
-        title:
-            const Text('Favorite Pets', style: TextStyle(color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      backgroundColor: const Color(0xFF1A1A2E),
-      body: favoritePets.isEmpty
-          ? const Center(
-              child: Text('No favorite pets yet.',
-                  style: TextStyle(color: Colors.white70, fontSize: 18)),
-            )
-          : ListView.builder(
-              itemCount: favoritePets.length,
-              itemBuilder: (context, i) {
-                final pet = favoritePets[i];
-                return Card(
-                  color: const Color(0xFF234022),
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            pet.image,
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                            errorBuilder: (c, e, s) =>
-                                const Icon(Icons.error, color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                pet.name,
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                              ),
-                              const SizedBox(height: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.shade700,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  pet.tier,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                pet.description,
-                                style: const TextStyle(
-                                    color: Colors.white70, fontSize: 15),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
     );
   }
 }
