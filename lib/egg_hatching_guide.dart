@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
+import 'pets_data.dart';
 
 class EggHatchingGuidePage extends StatelessWidget {
   final List<PetInfo> pets;
