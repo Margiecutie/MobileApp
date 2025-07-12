@@ -221,11 +221,18 @@ class _GardenPetHomeState extends State<GardenPetHome>
   List<Color> _getRarityColors(String rarity) {
     switch (rarity.toLowerCase()) {
       case 'common':
-        return [const Color(0xFF95A5A6), const Color(0xFF7F8C8D)];
+        // Use white for Common
+        return [const Color(0xFFF5F5F5), const Color(0xFFE0E0E0)];
       case 'rare':
         return [const Color(0xFF3498DB), const Color(0xFF2980B9)];
+      case 'legendary':
+        // Use gold/yellow for Legendary
+        return [const Color(0xFFFFD700), const Color(0xFFFFB300)];
       case 'divine':
         return [const Color(0xFFE74C3C), const Color(0xFFC0392B)];
+      case 'mythical':
+        // Use orange for Mythical
+        return [const Color(0xFFFF9800), const Color(0xFFF57C00)];
       default:
         return [const Color(0xFF95A5A6), const Color(0xFF7F8C8D)];
     }
@@ -499,8 +506,13 @@ class _GardenPetHomeState extends State<GardenPetHome>
                                           child: Text(
                                             pets[originalIndex].tier,
                                             textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              color: Colors.white,
+                                            style: TextStyle(
+                                              color: pets[originalIndex]
+                                                          .tier
+                                                          .toLowerCase() ==
+                                                      'common'
+                                                  ? Colors.black
+                                                  : Colors.white,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12,
                                             ),
@@ -533,58 +545,69 @@ class _GardenPetHomeState extends State<GardenPetHome>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: List.generate(
-                                pageCount,
-                                (i) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 200),
-                                    curve: Curves.easeInOut,
-                                    width: _petPage == i ? 44 : 38,
-                                    height: _petPage == i ? 44 : 38,
-                                    decoration: BoxDecoration(
-                                      color: _petPage == i
-                                          ? const Color(0xFF4CAF50)
-                                          : Colors.grey[800],
-                                      borderRadius: BorderRadius.circular(22),
-                                      boxShadow: [
-                                        if (_petPage == i)
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.18),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                      ],
-                                      border: Border.all(
+                          SizedBox(
+                            height: 48, // Constrain height for scroll view
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: List.generate(
+                                  pageCount,
+                                  (i) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 2), // More compact
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      curve: Curves.easeInOut,
+                                      width: _petPage == i
+                                          ? 38
+                                          : 32, // More compact
+                                      height: _petPage == i
+                                          ? 38
+                                          : 32, // More compact
+                                      decoration: BoxDecoration(
                                         color: _petPage == i
-                                            ? Colors.white
-                                            : Colors.grey[600]!,
-                                        width: 2,
+                                            ? const Color(0xFF4CAF50)
+                                            : Colors.grey[800],
+                                        borderRadius: BorderRadius.circular(19),
+                                        boxShadow: [
+                                          if (_petPage == i)
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.18),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                        ],
+                                        border: Border.all(
+                                          color: _petPage == i
+                                              ? Colors.white
+                                              : Colors.grey[600]!,
+                                          width: 2,
+                                        ),
                                       ),
-                                    ),
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.circular(22),
-                                        onTap: () {
-                                          setState(() {
-                                            _petPage = i;
-                                          });
-                                        },
-                                        child: Center(
-                                          child: Text(
-                                            "${i + 1}",
-                                            style: TextStyle(
-                                              color: _petPage == i
-                                                  ? Colors.white
-                                                  : Colors.white70,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: _petPage == i ? 20 : 17,
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(19),
+                                          onTap: () {
+                                            setState(() {
+                                              _petPage = i;
+                                            });
+                                          },
+                                          child: Center(
+                                            child: Text(
+                                              "${i + 1}",
+                                              style: TextStyle(
+                                                color: _petPage == i
+                                                    ? Colors.white
+                                                    : Colors.white70,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: _petPage == i
+                                                    ? 17
+                                                    : 15, // More compact
+                                              ),
                                             ),
                                           ),
                                         ),
