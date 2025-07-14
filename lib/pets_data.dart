@@ -508,19 +508,6 @@ final List<PetInfo> pets = [
     dateAdded: 'May, 10th, 2025',
   ),
   PetInfo(
-    name: 'Moon Cat',
-    image: 'assets/moon cat.png',
-    detailImage: 'assets/moon cat.png',
-    description: 'The Moon Cat',
-    tier: 'Legendary',
-    obtainingMethod: 'Summer Harvest',
-    hatchChance: '',
-    passive:
-        'Moon Nap: Cat naps in a random spot in your farm, emitting an aura that boosts nearby fruit size.\nMoon Harvest: Grants a 0.06% chance for Night type plants to replant when harvested.',
-    obtainable: 'Yes',
-    dateAdded: 'May 24th 2025',
-  ),
-  PetInfo(
     name: 'Petal Bee',
     image: 'assets/petal bee.png',
     detailImage: 'assets/petal bee.png',
@@ -591,8 +578,8 @@ final List<PetInfo> pets = [
     detailImage: 'assets/giant ant.png',
     description: 'The Giant Ant.',
     tier: 'Mythical',
-    obtainingMethod: 'Bug Egg 25%\nExotic Bug Egg 30%',
-    hatchChance: '',
+    obtainingMethod: 'Bug Egg',
+    hatchChance: '25%',
     passive:
         '~10% chance for harvested crops to duplicate. Rarer fruits duplicate less often. ~5% extra chance for Candy type fruit to duplicate!',
     obtainable: 'Yes',
@@ -618,8 +605,8 @@ final List<PetInfo> pets = [
     detailImage: 'assets/praying mantis.png',
     description: 'The Praying Mantis.',
     tier: 'Mythical',
-    obtainingMethod: 'Bug Egg 4%\nExotic Bug Egg 4%',
-    hatchChance: '',
+    obtainingMethod: 'Bug Egg',
+    hatchChance: '4%',
     passive:
         'Zen zone: Every 80s, prays for 10.30s granting a 1.51x variant chance to crops within 10.30 studs.',
     obtainable: 'Yes',
@@ -644,8 +631,8 @@ final List<PetInfo> pets = [
     detailImage: 'assets/snail.png',
     description: 'The Snail.',
     tier: 'Mythical',
-    obtainingMethod: 'Bug Egg 30%\nExotic Bug Egg 69%',
-    hatchChance: '',
+    obtainingMethod: 'Bug Egg',
+    hatchChance: '69%',
     passive:
         'Extra 5.08% chance harvested plants drop seeds. Rarer plants have a lower chance to duplicate',
     obtainable: 'Yes',
@@ -684,7 +671,7 @@ final List<PetInfo> pets = [
     detailImage: 'assets/butterfly.png',
     description: 'Butterfly',
     tier: 'Mythical',
-    obtainingMethod: 'Anti Bee Egg\nPremium Anti Bee Egg 149',
+    obtainingMethod: 'Anti Bee Egg',
     hatchChance: '1%',
     passive:
         'Rainbow flutter: Every ~30m, flies to a nearby fruit with 5+ mutations, removes all mutations from it and turns it rainbow! Ignores favorited fruit.',
@@ -698,7 +685,7 @@ final List<PetInfo> pets = [
     detailImage: 'assets/brontosaurus.png',
     description: 'The Brontosaurus.',
     tier: 'Mythical',
-    obtainingMethod: '',
+    obtainingMethod: 'Dinosaur Egg',
     hatchChance: '1%',
     passive:
         'Giant Incubator: Pets hatched from eggs have 60% to get higher base weight',
